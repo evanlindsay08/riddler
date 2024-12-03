@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riddler - Crypto Puzzle Challenge</title>
+    <style>
+        :root {
+            --dark-grey: #2c2c2c;
+            --light-grey: #3a3a3a;
+            --accent-green: #00ff9d;
+            --text-grey: #e0e0e0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: var(--dark-grey);
+            color: var(--text-grey);
+        }
+
+        header {
+            background-color: var(--light-grey);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+
+        .social-buttons a {
+            margin-left: 1rem;
+            text-decoration: none;
+        }
+
+        .social-buttons img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .buy-button {
+            background-color: var(--accent-green);
+            color: var(--dark-grey);
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .riddle-box {
+            background-color: var(--light-grey);
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .combination-input {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        input {
+            background-color: var(--dark-grey);
+            border: 2px solid var(--accent-green);
+            color: var(--accent-green);
+            padding: 0.5rem;
+            border-radius: 5px;
+            margin-right: 1rem;
+        }
+
+        button {
+            background-color: var(--accent-green);
+            color: var(--dark-grey);
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        .modal-content {
+            background-color: var(--light-grey);
+            margin: 15% auto;
+            padding: 2rem;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+        }
+
+        .close {
+            float: right;
+            cursor: pointer;
+            color: var(--accent-green);
+        }
+
+        /* Adding new styles for lock animation */
+        .lock-container {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .padlock {
+            width: 100px;
+            height: 100px;
+            transition: transform 0.5s;
+        }
+
+        .padlock.unlocked {
+            transform: rotate(-10deg) scale(1.2);
+            filter: drop-shadow(0 0 10px var(--accent-green));
+        }
+
+        .success-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            z-index: 1000;
+        }
+
+        .success-content {
+            background-color: var(--light-grey);
+            margin: 15% auto;
+            padding: 2rem;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid var(--accent-green);
+        }
+
+        .private-key {
+            background-color: var(--dark-grey);
+            padding: 1rem;
+            margin: 1rem 0;
+            word-break: break-all;
+            border-radius: 5px;
+        }
+
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            transition: transform 0.2s;
+        }
+
+        .social-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .padlock {
+            color: var(--accent-green);
+            filter: drop-shadow(0 0 2px rgba(0,255,157,0.5));
+        }
+
+        .padlock.unlocked {
+            transform: rotate(-10deg) scale(1.2);
+            filter: drop-shadow(0 0 10px var(--accent-green));
+        }
+
+        .social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 10px;
+    transition: transform 0.2s;
+}
+
+.social-icon:hover {
+    transform: scale(1.1);
+}
+
+.padlock {
+    color: var(--accent-green);
+    filter: drop-shadow(0 0 2px rgba(0,255,157,0.5));
+}
+
+.padlock.unlocked {
+    transform: rotate(-10deg) scale(1.2);
+    filter: drop-shadow(0 0 10px var(--accent-green));
+}
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">RIDDLER</div>
+        <div class="social-buttons">
+            <a href="https://x.com/RiddlerSol" target="_blank" class="social-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="#00ff9d" d="M22.46,6C21.69,6.35 20.86,6.58 20,6.69C20.88,6.16 21.56,5.32 21.88,4.31C21.05,4.81 20.13,5.16 19.16,5.36C18.37,4.5 17.26,4 16,4C13.65,4 11.73,5.92 11.73,8.29C11.73,8.63 11.77,8.96 11.84,9.27C8.28,9.09 5.11,7.38 3,4.79C2.63,5.42 2.42,6.16 2.42,6.94C2.42,8.43 3.17,9.75 4.33,10.5C3.62,10.5 2.96,10.3 2.38,10C2.38,10 2.38,10 2.38,10.03C2.38,12.11 3.86,13.85 5.82,14.24C5.46,14.34 5.08,14.39 4.69,14.39C4.42,14.39 4.15,14.36 3.89,14.31C4.43,16 6,17.26 7.89,17.29C6.43,18.45 4.58,19.13 2.56,19.13C2.22,19.13 1.88,19.11 1.54,19.07C3.44,20.29 5.7,21 8.12,21C16,21 20.33,14.46 20.33,8.79C20.33,8.6 20.33,8.42 20.32,8.23C21.16,7.63 21.88,6.87 22.46,6Z"/>
+                </svg>
+            </a>
+            <a href="https://t.me/Riddler_Sol" target="_blank" class="social-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="#00ff9d" d="M9.78,18.65L10.06,14.42L17.74,7.5C18.08,7.19 17.67,7.04 17.22,7.31L7.74,13.3L3.64,12C2.76,11.75 2.75,11.14 3.84,10.7L19.81,4.54C20.54,4.21 21.24,4.72 20.96,5.84L18.24,18.65C18.05,19.56 17.5,19.78 16.74,19.36L12.6,16.3L10.61,18.23C10.38,18.46 10.19,18.65 9.78,18.65Z"/>
+                </svg>
+            </a>
+            <a href="https://pump.fun/board" target="_blank" class="buy-button">BUY NOW</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="riddle-box">
+            <h2>Riddle #1</h2>
+            <p>What comes twice in a week, once in a year, but never in a day?</p>
+            <small>Hint: Count the letter's position in the alphabet</small>
+            <!-- Answer: 'E' is the 5th letter -->
+        </div>
+
+        <div class="riddle-box">
+            <h2>Riddle #2</h2>
+            <p>I am not alive, but I grow;<br>
+               I don't have lungs, but I need air;<br>
+               I don't have a mouth, but water kills me.<br>
+               What am I?</p>
+            <!-- Answer: FIRE = 2 -->
+        </div>
+
+        <div class="riddle-box">
+            <h2>Riddle #3</h2>
+            <p>01010011 01100101 01110110 01100101 01101110 00100000 00101011 00100000 01010100 01110111 01101111</p>
+            <small></small>
+            <!-- Answer: "Uno + Tres = 9" -->
+        </div>
+
+        <div class="riddle-box">
+            <h2>Final Riddle</h2>
+            <p>What number comes next: 8, 5, 4, 3, ?</p>
+            <!-- Answer: 1 (counting down pattern) -->
+        </div>
+
+        <div class="lock-container">
+            <svg class="padlock" id="padlock" width="100" height="100">
+                <use href="#padlock" />
+            </svg>
+        </div>
+
+        <div class="combination-input">
+            <input type="text" placeholder="Enter 4-digit code" maxlength="4">
+            <button onclick="checkCombination()">UNLOCK</button>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="success-modal">
+        <div class="success-content">
+            <h2>🎉 Congratulations! 🎉</h2>
+            <p>You've successfully unlocked the vault!</p>
+            <div class="private-key">
+                <h3>Private Key:</h3>
+                <p id="privateKey">2zHqF8SdvrohadbbLf52Lpm3S9vsB2UK4fFz2udW9F4R95eqoWzcj8APwcmh2YGVmwri97NQ114BPZAaps9VgKDR <!-- Replace with actual private key -->
+            </div>
+            <button onclick="document.getElementById('successModal').style.display='none'">Close</button>
+        </div>
+    </div>
+
+    <!-- Instructions Modal -->
+    <div id="instructionsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>How to Solve the Riddler</h2>
+            <ol>
+                <li>Each riddle contains a clue to a single digit</li>
+                <li>Solve the riddles in order to get the 4-digit combination</li>
+                <li>The combination will unlock the padlock</li>
+                <li>The final reward is a private key to the wallet</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Show instructions modal on page load
+        window.onload = function() {
+            document.getElementById('instructionsModal').style.display = 'block';
+        }
+
+        // Close modal when clicking X
+        document.querySelector('.close').onclick = function() {
+            document.getElementById('instructionsModal').style.display = 'none';
+        }
+
+        function checkCombination() {
+            const input = document.querySelector('input').value;
+            if(input === "5491") {
+                // Animate padlock
+                const padlock = document.getElementById('padlock');
+                padlock.classList.add('unlocked');
+                
+                // Show success modal after brief delay
+                setTimeout(() => {
+                    document.getElementById('successModal').style.display = 'block';
+                }, 1000);
+            } else {
+                alert("Incorrect combination. Try again!");
+            }
+        }
+    </script>
+</body>
+</html> 
